@@ -1,5 +1,5 @@
 const express = require("express");
-const { getPosts, addPost } = require("../controllers/feed");
+const { getPosts, addPost, getPost } = require("../controllers/feed");
 const router = express.Router();
 const { body } = require("express-validator");
 
@@ -16,5 +16,8 @@ router.post(
 
   addPost
 );
+
+// GET /feed/post/:postId
+router.get("/post/:postId", getPost);
 
 module.exports = router;
