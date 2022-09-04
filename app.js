@@ -3,12 +3,37 @@ const bodyParser = require("body-parser");
 const feedRoutes = require("./routes/feed");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const multer = require("multer");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json()); // application/json
 app.use(cors());
+// Multer configures where to store the files
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + "-" + file.originalname);
+  },
+});
+// Multer configures what files to accept
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  }
+  cb(null, false);
+};
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
+
 app.use("/images", express.static("images"));
 app.use("/feed", feedRoutes);
 

@@ -26,11 +26,17 @@ exports.addPost = (req, res, next) => {
     throw error;
   }
 
+  if (!req.file) {
+    const error = new Error("No image provided.");
+    error.statusCode = 422;
+    throw error;
+  }
+
   // Create post in db
   const post = new Post({
     title: title,
     content: content,
-    imageUrl: "images/book.jpeg",
+    imageUrl: req.file.path,
     creator: { name: "Max" },
   });
   post
@@ -39,7 +45,7 @@ exports.addPost = (req, res, next) => {
       res.status(201).json({
         message: "Post created successfully!",
         post: {
-          _id: new Date().toISOString(),
+          _id: result._id,
           title: title,
           content: content,
           createdAt: new Date(),
