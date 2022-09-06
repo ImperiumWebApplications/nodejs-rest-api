@@ -4,6 +4,7 @@ const {
   addPost,
   getPost,
   updatePost,
+  deletePost,
 } = require("../controllers/feed");
 const router = express.Router();
 const { body } = require("express-validator");
@@ -34,5 +35,8 @@ router.put(
   ],
   updatePost
 );
+
+// DELETE /feed/post/:postId
+router.delete("/post/:postId", deletePost);
 
 module.exports = router;
