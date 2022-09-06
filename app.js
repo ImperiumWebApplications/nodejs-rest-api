@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const feedRoutes = require("./routes/feed");
+const authRoutes = require("./routes/auth");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const multer = require("multer");
@@ -36,6 +37,7 @@ app.use(
 
 app.use("/images", express.static("images"));
 app.use("/feed", feedRoutes);
+app.use('/auth', authRoutes);
 
 const port = 8080;
 

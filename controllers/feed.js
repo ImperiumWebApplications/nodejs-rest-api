@@ -2,12 +2,26 @@ const { validationResult } = require("express-validator");
 const Post = require("../models/Post");
 const clearImage = require("../util/clearImage");
 
+const POSTS_PER_PAGE = 2;
+
 exports.getPosts = (req, res, next) => {
+  // Find all posts with pagination
+  const currentPage = req.query.page || 1;
+  let totalItems;
   Post.find()
+    .countDocuments()
+    .then((count) => {
+      totalItems = count;
+      return Post.find()
+        .skip((currentPage - 1) * POSTS_PER_PAGE)
+        .limit(POSTS_PER_PAGE);
+    })
     .then((posts) => {
-      res
-        .status(200)
-        .json({ message: "Fetched posts successfully.", posts: posts });
+      res.status(200).json({
+        message: "Fetched posts successfully.",
+        posts: posts,
+        totalItems: totalItems,
+      });
     })
     .catch((error) => {
       if (!error.statusCode) {
