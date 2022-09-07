@@ -5,31 +5,46 @@ const clearImage = require("../util/clearImage");
 
 const POSTS_PER_PAGE = 2;
 
-exports.getPosts = (req, res, next) => {
+exports.getPosts = async (req, res, next) => {
   // Find all posts with pagination
   const currentPage = req.query.page || 1;
-  let totalItems;
-  Post.find()
-    .countDocuments()
-    .then((count) => {
-      totalItems = count;
-      return Post.find()
-        .skip((currentPage - 1) * POSTS_PER_PAGE)
-        .limit(POSTS_PER_PAGE);
-    })
-    .then((posts) => {
-      res.status(200).json({
-        message: "Fetched posts successfully.",
-        posts: posts,
-        totalItems: totalItems,
-      });
-    })
-    .catch((error) => {
-      if (!error.statusCode) {
-        error.statusCode = 500;
-      }
-      next(error);
+  // Post.find()
+  //   .countDocuments()
+  //   .then((count) => {
+  //     totalItems = count;
+  //     return Post.find()
+  //       .skip((currentPage - 1) * POSTS_PER_PAGE)
+  //       .limit(POSTS_PER_PAGE);
+  //   })
+  //   .then((posts) => {
+  //     res.status(200).json({
+  //       message: "Fetched posts successfully.",
+  //       posts: posts,
+  //       totalItems: totalItems,
+  //     });
+  //   })
+  //   .catch((error) => {
+  //     if (!error.statusCode) {
+  //       error.statusCode = 500;
+  //     }
+  //     next(error);
+  //   });
+  try {
+    const totalItems = await Post.find().countDocuments();
+    const posts = await Post.find()
+      .skip((currentPage - 1) * POSTS_PER_PAGE)
+      .limit(POSTS_PER_PAGE);
+    res.status(200).json({
+      message: "Fetched posts successfully.",
+      posts: posts,
+      totalItems: totalItems,
     });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    next(error);
+  }
 };
 
 exports.addPost = (req, res, next) => {
@@ -189,4 +204,3 @@ exports.deletePost = (req, res, next) => {
       next(error);
     });
 };
-
