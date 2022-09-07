@@ -20,16 +20,18 @@ router.post(
     body("title").trim().isLength({ min: 5 }),
     body("content").trim().isLength({ min: 5 }),
   ],
+  isAuth,
 
   addPost
 );
 
 // GET /feed/post/:postId
-router.get("/post/:postId", getPost);
+router.get("/post/:postId", isAuth, getPost);
 
 // PUT /feed/post/:postId
 router.put(
   "/post/:postId",
+  isAuth,
   [
     body("title").trim().isLength({ min: 5 }),
     body("content").trim().isLength({ min: 5 }),
