@@ -172,6 +172,14 @@ exports.deletePost = (req, res, next) => {
       return Post.findByIdAndRemove(postId);
     })
     .then((result) => {
+      // Find and remove the post from the user array for the creator of the post
+      return User.findById(req.userData.userId);
+    })
+    .then((user) => {
+      user.posts.pull(postId);
+      return user.save();
+    })
+    .then((result) => {
       res.status(200).json({ message: "Deleted post." });
     })
     .catch((error) => {
