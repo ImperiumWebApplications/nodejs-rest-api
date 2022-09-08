@@ -33,7 +33,7 @@ exports.addPost = async (req, res, next) => {
   if (!errors.isEmpty()) {
     const error = new Error("Validation failed, entered data is incorrect.");
     error.statusCode = 422;
-    throw error;
+    return next(error);
   }
 
   if (!req.file) {
@@ -94,7 +94,7 @@ exports.updatePost = async (req, res, next) => {
   if (!errors.isEmpty()) {
     const error = new Error("Validation failed, entered data is incorrect.");
     error.statusCode = 422;
-    throw error;
+    return next(error);
   }
 
   try {
