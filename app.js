@@ -1,11 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const feedRoutes = require("./routes/feed");
-const authRoutes = require("./routes/auth");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const dotenv = require("dotenv");
+const socket = require("socket.io");
+const feedRoutes = require("./routes/feed");
+const authRoutes = require("./routes/auth");
 dotenv.config();
 
 const app = express();
@@ -37,7 +38,7 @@ app.use(
 
 app.use("/images", express.static("images"));
 app.use("/feed", feedRoutes);
-app.use('/auth', authRoutes);
+app.use("/auth", authRoutes);
 
 const port = 8080;
 
@@ -55,8 +56,21 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(port, () => {
-      console.log(`App listening at http://localhost:${port}`);
+    const server = app.listen(port);
+    // Setup socket.io
+    const io = socket(server, {
+      cors: {
+        origin: "*",
+      },
+    });
+    io.on("connection", (socket) => {
+      console.log("Made socket connection", socket.id);
+      // socket.on("chat", (data) => {
+      //   io.sockets.emit("chat", data);
+      // });
+      // socket.on("typing", (data) => {
+      //   socket.broadcast.emit("typing", data);
+      // });
     });
   })
   .catch((err) => console.log(err));
