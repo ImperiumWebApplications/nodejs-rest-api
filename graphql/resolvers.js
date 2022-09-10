@@ -1,18 +1,28 @@
-const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const validator = require("validator");
 
 const User = require("../models/user");
 
 module.exports = {
   signup: async function ({ email, password, name, status }, req) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        const error = new Error("Validation failed.");
-        error.statusCode = 422;
-        error.data = errors.array();
+      const errors = [];
+      if (!validator.isEmail(email)) {
+        errors.push({ message: "E-Mail is invalid." });
+      }
+      if (
+        validator.isEmpty(password) ||
+        !validator.isLength(password, { min: 5 })
+      ) {
+        errors.push({ message: "Password too short!" });
+      }
+      if (errors.length > 0) {
+        const error = new Error("Invalid input.");
+        error.data = errors;
+        error.code = 422;
         throw error;
       }
+
       const existingUser = await User.findOne({ email: email });
       if (existingUser) {
         const error = new Error("User exists already!");
@@ -29,6 +39,9 @@ module.exports = {
       const createdUser = await user.save();
       return { ...createdUser._doc, _id: createdUser._id.toString() };
     } catch (error) {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
       throw error;
     }
   },
