@@ -7,6 +7,7 @@ const dotenv = require("dotenv");
 const { graphqlHTTP } = require("express-graphql");
 
 const auth = require("./middleware/is-auth");
+const clearImage = require("./util/clearImage");
 dotenv.config();
 
 const app = express();
@@ -41,6 +42,24 @@ const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
 
 app.use(auth);
+
+app.put("/post-image", (req, res, next) => {
+  if (!req.isAuth) {
+    const error = new Error("Not authenticated!");
+    error.statusCode = 401;
+    throw error;
+  }
+  if (!req.file) {
+    return res.status(200).json({ message: "No file provided!" });
+  }
+  if (req.body.oldPath) {
+    clearImage(req.body.oldPath);
+  }
+  return res
+    .status(201)
+    .json({ message: "File stored.", filePath: req.file.path });
+});
+
 app.use(
   "/graphql",
   graphqlHTTP({
