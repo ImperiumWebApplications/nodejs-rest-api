@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const dotenv = require("dotenv");
 const { graphqlHTTP } = require("express-graphql");
+
+const auth = require("./middleware/is-auth");
 dotenv.config();
 
 const app = express();
@@ -37,6 +39,8 @@ app.use(
 // GraphQL setup and configuration
 const graphqlSchema = require("./graphql/schema");
 const graphqlResolver = require("./graphql/resolvers");
+
+app.use(auth);
 app.use(
   "/graphql",
   graphqlHTTP({
