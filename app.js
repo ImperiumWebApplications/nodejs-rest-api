@@ -4,8 +4,6 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const dotenv = require("dotenv");
-const feedRoutes = require("./routes/feed");
-const authRoutes = require("./routes/auth");
 const { init } = require("./socket");
 dotenv.config();
 
@@ -37,8 +35,6 @@ app.use(
 );
 
 app.use("/images", express.static("images"));
-app.use("/feed", feedRoutes);
-app.use("/auth", authRoutes);
 
 const port = 8080;
 
@@ -56,7 +52,8 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    const server = app.listen(port);
-    init(server);
+    app.listen(port, () => {
+      console.log(`Server listening on port ${port}`);
+    });
   })
   .catch((err) => console.log(err));
