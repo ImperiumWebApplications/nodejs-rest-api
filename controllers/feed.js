@@ -3,6 +3,8 @@ const Post = require("../models/post");
 const User = require("../models/user");
 const clearImage = require("../util/clearImage");
 
+const io = require("../socket");
+
 const POSTS_PER_PAGE = 2;
 
 exports.getPosts = async (req, res, next) => {
@@ -55,6 +57,14 @@ exports.addPost = async (req, res, next) => {
     const user = await User.findById(req.userData.userId);
     user.posts.push(post);
     await user.save();
+    io.getIO().emit("posts", {
+      action: "create",
+      post: {
+        ...post._doc,
+        creator: { _id: req.userData.userId, name: user.name },
+      },
+    });
+
     res.status(201).json({
       message: "Post created successfully!",
       post: post,

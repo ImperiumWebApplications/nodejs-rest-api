@@ -4,9 +4,9 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const dotenv = require("dotenv");
-const socket = require("socket.io");
 const feedRoutes = require("./routes/feed");
 const authRoutes = require("./routes/auth");
+const { init } = require("./socket");
 dotenv.config();
 
 const app = express();
@@ -57,20 +57,6 @@ mongoose
   })
   .then(() => {
     const server = app.listen(port);
-    // Setup socket.io
-    const io = socket(server, {
-      cors: {
-        origin: "*",
-      },
-    });
-    io.on("connection", (socket) => {
-      console.log("Made socket connection", socket.id);
-      // socket.on("chat", (data) => {
-      //   io.sockets.emit("chat", data);
-      // });
-      // socket.on("typing", (data) => {
-      //   socket.broadcast.emit("typing", data);
-      // });
-    });
+    init(server);
   })
   .catch((err) => console.log(err));
