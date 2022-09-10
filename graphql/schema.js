@@ -3,7 +3,7 @@ const graphql = require("graphql");
 const { buildSchema } = graphql;
 module.exports = buildSchema(`
     type RootMutation{
-        signup(email: String!, password: String!, name: String!, status: String!): User!
+        signup(email: String!, password: String!, name: String!): User!
     }
 
     type User{

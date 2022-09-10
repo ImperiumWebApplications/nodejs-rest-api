@@ -4,7 +4,7 @@ const validator = require("validator");
 const User = require("../models/user");
 
 module.exports = {
-  signup: async function ({ email, password, name, status }, req) {
+  signup: async function ({ email, password, name }, req) {
     try {
       const errors = [];
       if (!validator.isEmail(email)) {
@@ -34,7 +34,7 @@ module.exports = {
         email: email,
         name: name,
         password: hashedPw,
-        status: status,
+        status: "I am new!",
       });
       const createdUser = await user.save();
       return { ...createdUser._doc, _id: createdUser._id.toString() };
