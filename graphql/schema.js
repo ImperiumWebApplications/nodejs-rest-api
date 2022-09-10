@@ -27,8 +27,14 @@ module.exports = buildSchema(`
         updatedAt: String!
     }
 
+    type AuthData{
+        userId: ID!
+        token: String!
+    }
+
+
     type RootQuery{
-        hello: String
+        login(email: String!, password: String!): AuthData!
     }
 
 
