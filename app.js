@@ -4,7 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const dotenv = require("dotenv");
-const { init } = require("./socket");
+const { graphqlHTTP } = require("express-graphql");
 dotenv.config();
 
 const app = express();
@@ -32,6 +32,18 @@ const fileFilter = (req, file, cb) => {
 };
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
+
+// GraphQL setup and configuration
+const graphqlSchema = require("./graphql/schema");
+const graphqlResolver = require("./graphql/resolvers");
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
+    graphiql: true,
+  })
 );
 
 app.use("/images", express.static("images"));
