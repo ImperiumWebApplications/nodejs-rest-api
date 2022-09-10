@@ -12,10 +12,13 @@ exports.getPosts = async (req, res, next) => {
   const currentPage = req.query.page || 1;
   try {
     const totalItems = await Post.find().countDocuments();
+    // Get the latest posts first
     const posts = await Post.find()
       .populate("creator")
+      .sort({ createdAt: -1 })
       .skip((currentPage - 1) * POSTS_PER_PAGE)
       .limit(POSTS_PER_PAGE);
+
     res.status(200).json({
       message: "Fetched posts successfully.",
       posts: posts,
@@ -109,7 +112,7 @@ exports.updatePost = async (req, res, next) => {
   }
 
   try {
-    const post = await Post.findById(postId).populate('creator');
+    const post = await Post.findById(postId).populate("creator");
     if (!post) {
       const error = new Error("Could not find post.");
       error.statusCode = 404;
