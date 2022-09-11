@@ -1,10 +1,10 @@
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
 
 const User = require("../models/user");
 const Post = require("../models/post");
+const clearImage = require("../util/clearImage");
 
 module.exports = {
   signup: async function ({ email, password, name }, req) {
@@ -267,6 +267,81 @@ module.exports = {
         createdAt: updatedPost.createdAt.toISOString(),
         updatedAt: updatedPost.updatedAt.toISOString(),
       };
+    } catch (error) {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      throw error;
+    }
+  },
+  deletePost: async function ({ id }, req) {
+    try {
+      if (!req.isAuth) {
+        const error = new Error("Not authenticated!");
+        error.statusCode = 401;
+        throw error;
+      }
+      const post = await Post.findById(id);
+      if (!post) {
+        const error = new Error("No post found!");
+        error.statusCode = 404;
+        throw error;
+      }
+      if (post.creator.toString() !== req.userData.userId) {
+        const error = new Error("Not authorized!");
+        error.statusCode = 403;
+        throw error;
+      }
+      clearImage(post.imageUrl);
+      await Post.findByIdAndRemove(id);
+      const user = await User.findById(req.userData.userId);
+      user.posts.pull(id);
+      await user.save();
+      return true;
+    } catch (error) {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      throw error;
+    }
+  },
+  getUserStatus: async function (args, req) {
+    try {
+      if (!req.isAuth) {
+        const error = new Error("Not authenticated!");
+        error.statusCode = 401;
+        throw error;
+      }
+      const user = await User.findById(req.userData.userId);
+      if (!user) {
+        const error = new Error("Invalid user.");
+        error.statusCode = 401;
+        throw error;
+      }
+      return { status: user.status };
+    } catch (error) {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      throw error;
+    }
+  },
+  updateUserStatus: async function ({ status }, req) {
+    try {
+      if (!req.isAuth) {
+        const error = new Error("Not authenticated!");
+        error.statusCode = 401;
+        throw error;
+      }
+      const user = await User.findById(req.userData.userId);
+      if (!user) {
+        const error = new Error("Invalid user.");
+        error.statusCode = 401;
+        throw error;
+      }
+      user.status = status;
+      await user.save();
+      return user;
     } catch (error) {
       if (!error.statusCode) {
         error.statusCode = 500;

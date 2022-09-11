@@ -6,6 +6,8 @@ module.exports = buildSchema(`
         signup(email: String!, password: String!, name: String!): User!
         createPost(postInput: PostInputData): Post!
         updatePost(id: ID!, postInput: PostInputData): Post!
+        deletePost(id: ID!): Boolean!
+        updateUserStatus(status: String!): User!
     }
 
     type User{
@@ -47,11 +49,16 @@ module.exports = buildSchema(`
         totalPosts: Int!
     }
 
+    type userStatus {
+        status: String!
+    }
+
 
     type RootQuery{
         login(email: String!, password: String!): AuthData!
         getPosts(page: Int): AllPosts!
         getPost(postId: ID!): Post!
+        getUserStatus: userStatus!
     }
 
 
