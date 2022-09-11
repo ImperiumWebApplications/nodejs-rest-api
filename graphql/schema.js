@@ -5,6 +5,7 @@ module.exports = buildSchema(`
     type RootMutation{
         signup(email: String!, password: String!, name: String!): User!
         createPost(postInput: PostInputData): Post!
+        updatePost(id: ID!, postInput: PostInputData): Post!
     }
 
     type User{
