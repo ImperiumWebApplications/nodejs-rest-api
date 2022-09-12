@@ -80,7 +80,7 @@ app.use(
 
 app.use("/images", express.static("images"));
 
-const port = 8080;
+const port = process.env.PORT;
 
 app.use((error, req, res, next) => {
   console.log(error);
