@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -5,6 +7,8 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const dotenv = require("dotenv");
 const helmet = require("helmet");
+const morgan = require("morgan");
+const compression = require("compression");
 const { graphqlHTTP } = require("express-graphql");
 
 const auth = require("./middleware/is-auth");
@@ -14,8 +18,24 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json()); // application/json
 app.use(cors());
-// Helmet configuration
+// Helmet configuration and allow cross origin requests
 app.use(helmet());
+// Express compression
+app.use(compression());
+// Mogran configuration and write logs to file
+app.use(
+  morgan("combined", {
+    stream: fs.createWriteStream(path.join(__dirname, "access.log"), {
+      flags: "a",
+    }),
+  })
+);
+
+// Set the  cross-origin resource policy response header to cross-origin
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+});
 
 // Multer configures where to store the files
 const fileStorage = multer.diskStorage({
