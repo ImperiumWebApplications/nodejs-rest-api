@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const dotenv = require("dotenv");
+const helmet = require("helmet");
 const { graphqlHTTP } = require("express-graphql");
 
 const auth = require("./middleware/is-auth");
@@ -13,6 +14,9 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json()); // application/json
 app.use(cors());
+// Helmet configuration
+app.use(helmet());
+
 // Multer configures where to store the files
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
