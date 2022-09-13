@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const https = require("https");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -34,6 +35,11 @@ app.use(
 // Set the  cross-origin resource policy response header to cross-origin
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self' https://localhost:8080/graphql; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self'"
+  );
+
   next();
 });
 
@@ -114,13 +120,22 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message, data });
 });
 
+// Setup https with server.cert and server.key
+const server = https.createServer(
+  {
+    key: fs.readFileSync("server.key"),
+    cert: fs.readFileSync("server.cert"),
+  },
+  app
+);
+
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(port, () => {
+    server.listen(port, () => {
       console.log(`Server listening on port ${port}`);
     });
   })
