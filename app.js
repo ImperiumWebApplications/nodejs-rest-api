@@ -121,13 +121,13 @@ app.use((error, req, res, next) => {
 });
 
 // Setup https with server.cert and server.key
-const server = https.createServer(
-  {
-    key: fs.readFileSync("server.key"),
-    cert: fs.readFileSync("server.cert"),
-  },
-  app
-);
+// const server = https.createServer(
+//   {
+//     key: fs.readFileSync("server.key"),
+//     cert: fs.readFileSync("server.cert"),
+//   },
+//   app
+// );
 
 mongoose
   .connect(process.env.MONGODB_URI, {
@@ -135,7 +135,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    server.listen(port, () => {
+    app.listen(port, () => {
       console.log(`Server listening on port ${port}`);
     });
   })
